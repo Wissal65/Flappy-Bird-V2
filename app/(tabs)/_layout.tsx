@@ -10,6 +10,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
+<<<<<<< HEAD
     screenOptions={{
       tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
       headerShown: false,
@@ -20,6 +21,12 @@ export default function TabLayout() {
         elevation: 0, // Removes the shadow on Android
       },
     }}>
+=======
+      screenOptions={{
+        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        headerShown: false,
+      }}>
+>>>>>>> e08c9f48163d1d98e9f366b18d3e8fcd79f29275
       <Tabs.Screen
         name="index"
         options={{
@@ -29,7 +36,11 @@ export default function TabLayout() {
           ),
         }}
       />
+<<<<<<< HEAD
       {/* <Tabs.Screen
+=======
+      <Tabs.Screen
+>>>>>>> e08c9f48163d1d98e9f366b18d3e8fcd79f29275
         name="explore"
         options={{
           title: 'Explore',
@@ -37,7 +48,11 @@ export default function TabLayout() {
             <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
           ),
         }}
+<<<<<<< HEAD
       /> */}
+=======
+      />
+>>>>>>> e08c9f48163d1d98e9f366b18d3e8fcd79f29275
     </Tabs>
   );
 }
