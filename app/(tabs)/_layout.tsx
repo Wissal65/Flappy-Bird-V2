@@ -10,23 +10,21 @@ export default function TabLayout() {
 
   return (
     <Tabs
-<<<<<<< HEAD
     screenOptions={{
       tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
       headerShown: false,
+      
+      tabBarShowLabel: false,
       tabBarStyle: {
         backgroundColor: 'transparent', // Set the background to transparent
         position: 'absolute', // This makes sure the background is fully transparent
         borderTopWidth: 0, // Removes the border line at the top of the tab bar
         elevation: 0, // Removes the shadow on Android
+        display:'none'
+       
+        
       },
     }}>
-=======
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-      }}>
->>>>>>> e08c9f48163d1d98e9f366b18d3e8fcd79f29275
       <Tabs.Screen
         name="index"
         options={{
@@ -36,11 +34,11 @@ export default function TabLayout() {
           ),
         }}
       />
-<<<<<<< HEAD
+
       {/* <Tabs.Screen
-=======
+
       <Tabs.Screen
->>>>>>> e08c9f48163d1d98e9f366b18d3e8fcd79f29275
+
         name="explore"
         options={{
           title: 'Explore',
@@ -48,11 +46,8 @@ export default function TabLayout() {
             <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
           ),
         }}
-<<<<<<< HEAD
+
       /> */}
-=======
-      />
->>>>>>> e08c9f48163d1d98e9f366b18d3e8fcd79f29275
     </Tabs>
   );
 }

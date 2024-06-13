@@ -1,136 +1,137 @@
-<<<<<<< HEAD
-// src/components/Game.tsx
-import React, { PureComponent } from 'react';
-import { GameEngine } from 'react-native-game-engine';
-import Matter from 'matter-js';
+import React, { useState, useRef, useCallback } from 'react'; 
+import { StyleSheet, Text, View, StatusBar, TouchableOpacity, Image } from 'react-native'; 
+import Matter from "matter-js"; 
+import { GameEngine } from "react-native-game-engine";  
+import Images from '@/assets/Images'; 
+import Const from '@/assets/Constants'; 
+import Floor from '@/components/Floor';
+import Physics from '@/Physics';
 
-// Define the type for the component props
-interface GameProps {}
+const Game = () => {
+    const [running, setRunning] = useState(true); // Declare state variable running, initialize to true, and create setter function setRunning
+    const [score, setScore] = useState(0); // Declare state variable score, initialize to 0, and create setter function setScore
+    const gameEngine = useRef<GameEngine & { dispatch: (e: any) => void }>(null); // Create a ref for the game engine with explicit type
 
-// Define the type for the component state
-interface GameState {
-  running: boolean;
-}
+    const setupWorld = useCallback(() => { // Define function setupWorld
+        let engine = Matter.Engine.create({ enableSleeping: false }); // Create Matter engine
+        let world = engine.world; // Get Matter world from engine
+        world.gravity.y = 0.0; // Set gravity to 0
 
-export default class Game extends PureComponent<GameProps, GameState> {
-  private entities: any;
+        let floor1 = Matter.Bodies.rectangle( // Create floor body 1
+            Const.MAX_WIDTH / 2,
+            Const.MAX_HEIGHT - 25,
+            Const.MAX_WIDTH + 4,
+            50,
+            { isStatic: true }
+        );
 
-  constructor(props: GameProps) {
-    super(props);
-    this.state = {
-      running: true,
-    };
-    this.entities = {}; // Initialize entities
-  }
+        let floor2 = Matter.Bodies.rectangle( // Create floor body 2
+            Const.MAX_WIDTH + (Const.MAX_WIDTH / 2),
+            Const.MAX_HEIGHT - 25,
+            Const.MAX_WIDTH + 4,
+            50,
+            { isStatic: true }
+        );
 
-  componentDidMount() {
-    this.setupWorld();
-  }
+        Matter.World.add(world, [floor1, floor2]); // Add bodies to the Matter world
+        Matter.Events.on(engine, 'collisionStart', (event) => { // Listen for collision events
+            if (gameEngine.current) { // Ensure gameEngine.current is not null
+                gameEngine.current.dispatch({ type: "game-over" }); // Dispatch game-over event
+            }
+        });
 
-  setupWorld = () => {
-    const engine = Matter.Engine.create();
-    const world = engine.world;
+        return { // Return entities object
+            physics: { engine: engine, world: world }, // Physics engine and world
+            floor1: { body: floor1, renderer: Floor }, // Floor body 1
+            floor2: { body: floor2, renderer: Floor }, // Floor body 2
+        };
+    }, [gameEngine]); // Dependency array includes gameEngine
 
-    // Définir l'oiseau
-    const bird = Matter.Bodies.rectangle(50, 200, 40, 40);
+    const entities = useRef(setupWorld()); // Create a ref for entities, initialize with setupWorld
 
-    // Ajouter l'oiseau au monde
-    Matter.World.add(world, [bird]);
+    const onEvent = useCallback((e: { type: string; }) => { // Define function onEvent
+        if (e.type === "game-over") { // Check if event type is game-over
+            setRunning(false); // Set running to false
+        } else if (e.type === "score") { // Check if event type is score
+            setScore(prevScore => prevScore + 1); // Increment score by 1
+        }
+    }, []); // Dependency array is empty
 
-    this.entities = {
-      physics: { engine: engine, world: world },
-      bird: { body: bird, renderer: <Bird /> },
-    };
+    const reset = useCallback(() => { // Define function reset
+        entities.current = setupWorld(); // Reset entities with setupWorld
+        setRunning(true); // Set running to true
+        setScore(0); // Reset score to 0
+    }, [setupWorld]); // Dependency array includes setupWorld
 
-    Matter.Engine.run(engine);
-  };
-
-  render() {
-    return (
-      <GameEngine
-        style={{ flex: 1, backgroundColor: 'white' }}
-        systems={[]}
-        entities={this.entities}>
-      </GameEngine>
+    return ( // Return JSX
+        <View style={styles.container}>
+            <Image source={Images.background} style={styles.backgroundImage} resizeMode="stretch" />
+            <GameEngine
+                ref={gameEngine}
+                style={styles.gameContainer}
+                systems={[Physics]}
+                running={running}
+                onEvent={onEvent}
+                entities={entities.current}>
+                <StatusBar hidden={true} />
+            </GameEngine>
+            <Text style={styles.score}>{score}</Text>
+            {!running && (
+                <TouchableOpacity style={styles.fullScreenButton} onPress={reset}>
+                    <View style={styles.fullScreen}>
+                        <Text style={styles.gameOverText}>Game Over</Text>
+                        <Text style={styles.gameOverSubText}>Try Again</Text>
+                    </View>
+                </TouchableOpacity>
+            )}
+        </View>
     );
-  }
-}
-
-// Assuming you have a Bird component defined elsewhere
-const Bird = () => {
-  return (
-    <div style={{ width: 40, height: 40, backgroundColor: 'red' }} />
-  );
 };
-=======
-import { Image, StyleSheet, Platform } from 'react-native';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
-}
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+const styles = StyleSheet.create({ // Define styles using StyleSheet
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+    },
+    backgroundImage: {
+        ...StyleSheet.absoluteFillObject, // Apply absolute fill to image
+        width: Const.MAX_WIDTH,
+        height: Const.MAX_HEIGHT
+    },
+    gameContainer: {
+        ...StyleSheet.absoluteFillObject, // Apply absolute fill to game container
+    },
+    gameOverText: {
+        color: 'white',
+        fontSize: 48,
+        fontFamily: '04b_19'
+    },
+    gameOverSubText: {
+        color: 'white',
+        fontSize: 24,
+        fontFamily: '04b_19'
+    },
+    fullScreen: {
+        ...StyleSheet.absoluteFillObject, // Apply absolute fill to full screen
+        backgroundColor: 'black',
+        opacity: 0.8,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    score: {
+        position: 'absolute',
+        color: 'white',
+        fontSize: 72,
+        top: 50,
+        left: Const.MAX_WIDTH / 2 - 20,
+        textShadowColor: '#444444',
+        textShadowOffset: { width: 2, height: 2},
+        textShadowRadius: 2,
+        fontFamily: '04b_19'
+    },
+    fullScreenButton: {
+        ...StyleSheet.absoluteFillObject, // Apply absolute fill to full screen button
+    }
 });
->>>>>>> e08c9f48163d1d98e9f366b18d3e8fcd79f29275
+
+export default Game; // Export Game component
