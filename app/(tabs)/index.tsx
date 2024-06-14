@@ -5,6 +5,7 @@ import { GameEngine } from "react-native-game-engine";
 import Images from '@/assets/Images'; 
 import Const from '@/assets/Constants'; 
 import Floor from '@/components/Floor';
+import Bird from '@/components/Bird';
 import Physics from '@/Physics';
 
 const Game = () => {
@@ -16,7 +17,8 @@ const Game = () => {
         let engine = Matter.Engine.create({ enableSleeping: false }); // Create Matter engine
         let world = engine.world; // Get Matter world from engine
         world.gravity.y = 0.0; // Set gravity to 0
-
+        
+        let bird = Matter.Bodies.rectangle( Const.MAX_WIDTH / 2, Const.MAX_HEIGHT / 2, Const.BIRD_WIDTH, Const.BIRD_HEIGHT);
         let floor1 = Matter.Bodies.rectangle( // Create floor body 1
             Const.MAX_WIDTH / 2,
             Const.MAX_HEIGHT - 25,
@@ -33,9 +35,10 @@ const Game = () => {
             { isStatic: true }
         );
 
-        Matter.World.add(world, [floor1, floor2]); // Add bodies to the Matter world
+        Matter.World.add(world, [bird, floor1, floor2]); // Add bodies to the Matter world
         Matter.Events.on(engine, 'collisionStart', (event) => { // Listen for collision events
             if (gameEngine.current) { // Ensure gameEngine.current is not null
+                var pairs = event.pairs;
                 gameEngine.current.dispatch({ type: "game-over" }); // Dispatch game-over event
             }
         });
@@ -44,6 +47,7 @@ const Game = () => {
             physics: { engine: engine, world: world }, // Physics engine and world
             floor1: { body: floor1, renderer: Floor }, // Floor body 1
             floor2: { body: floor2, renderer: Floor }, // Floor body 2
+            bird: { body: bird, renderer: Bird},
         };
     }, [gameEngine]); // Dependency array includes gameEngine
 
@@ -135,3 +139,6 @@ const styles = StyleSheet.create({ // Define styles using StyleSheet
 });
 
 export default Game; // Export Game component
+
+
+
