@@ -11,6 +11,7 @@ export const randomBetween = (min, max) => {
 const Physics = (entities, { touches, time, dispatch }) => {
     let engine = entities.physics.engine;
     let world = entities.physics.world;
+    let bird = entities.bird.body;
 
     let hadTouches = false;
     touches.filter(t => t.type === "press").forEach(t => {
@@ -20,6 +21,10 @@ const Physics = (entities, { touches, time, dispatch }) => {
             }
 
             hadTouches = true;
+            Matter.Body.setVelocity( bird, {
+                x: bird.velocity.x,
+                y: -10
+            });
         }
 
     });
