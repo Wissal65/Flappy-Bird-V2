@@ -16,10 +16,10 @@ const Floor = (props) => {
             {Array.apply(null, Array(imageIterations)).map((el, idx) => {
                 return (
                     <Image
-                        style={styles.image}
-                        key={idx}
+                        style={[styles.image,{width: height, height: height }]}
                         resizeMode="stretch"
                         source={Images.floor}
+                        key={idx} 
                     />
                 );
             })}
@@ -32,10 +32,8 @@ const styles = StyleSheet.create({
         position: "absolute",
         overflow: "hidden",
         flexDirection: "row",
-        zIndex: 1, // Adjust the zIndex to ensure the floor is rendered above other components
     },
     image: {
-        flex: 1, // Ensure the image fills the entire container
     },
 });
 
