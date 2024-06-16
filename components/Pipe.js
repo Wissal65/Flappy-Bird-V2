@@ -1,4 +1,3 @@
-// components/Floor.js
 
 import React from "react";
 import { View, Image, StyleSheet } from "react-native";
@@ -10,16 +9,16 @@ const Pipe = (props) => {
     const x = props.body.position.x - width / 2;
     const y = props.body.position.y - height / 2;
 
-    const pipeRatio = 138 / width;
-const pipeHeight = 104 * pipeRatio;
+const pipeRatio = 160 / width;
+const pipeHeight = 33* pipeRatio;
 const pipeIterations = Math.ceil(height / pipeHeight)
 
     return (
         <View style={[styles.container, { left: x, top: y, width: width, height: height }]}>
-            {Array.apply(null, Array(pipeIterations)).map((el, idx) => {
+               {Array.from({ length: pipeIterations }).map((_, idx) => {
                 return (
                     <Image
-                        style={[styles.image,{width: height, height: height }]}
+                        style={[styles.image,{width: width, height: pipeHeight }]}
                         resizeMode="stretch"
                         source={Images.pipeCore}
                         key={idx} 

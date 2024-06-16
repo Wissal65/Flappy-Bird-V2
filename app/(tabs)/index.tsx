@@ -6,7 +6,7 @@ import Images from '@/assets/Images';
 import Const from '@/assets/Constants'; 
 import Floor from '@/components/Floor';
 import Bird from '@/components/Bird';
-import Physics from '@/Physics';
+import Physics, { resetPipes }  from '@/Physics';
 
 const Game = () => {
     const [running, setRunning] = useState(true); // Declare state variable running, initialize to true, and create setter function setRunning
@@ -19,6 +19,7 @@ const Game = () => {
         world.gravity.y = 0.0; // Set gravity to 0
         
         let bird = Matter.Bodies.rectangle( Const.MAX_WIDTH / 2, Const.MAX_HEIGHT / 2, Const.BIRD_WIDTH, Const.BIRD_HEIGHT);
+
         let floor1 = Matter.Bodies.rectangle( // Create floor body 1
             Const.MAX_WIDTH / 2,
             Const.MAX_HEIGHT - 25,
@@ -62,6 +63,7 @@ const Game = () => {
     }, []); // Dependency array is empty
 
     const reset = useCallback(() => { // Define function reset
+        resetPipes();
         entities.current = setupWorld(); // Reset entities with setupWorld
         setRunning(true); // Set running to true
         setScore(0); // Reset score to 0

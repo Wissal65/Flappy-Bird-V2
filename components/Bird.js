@@ -8,6 +8,7 @@ const Bird = (props) => {
   const height = props.body.bounds.max.y - props.body.bounds.min.y;
   const x = props.body.position.x - width / 2;
   const y = props.body.position.y - height / 2;
+
   return (
     <Image
       style={[styles.image, { left: x, top: y, width: width, height: height }]}

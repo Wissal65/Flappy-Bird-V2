@@ -12,10 +12,9 @@ const PipeTop = (props) => {
 
     return (
                     <Image
-                        style={[styles.image,{width: width, height: height }]}
+                        style={[styles.image,{left: x, top: y, width: width, height: height }]}
                         resizeMode="stretch"
-                        source={Images.PipeTop}
-                        key={idx} 
+                        source={Images.pipeTop} 
                     />
     );
 };
