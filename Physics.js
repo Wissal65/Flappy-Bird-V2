@@ -3,11 +3,15 @@ import { Dimensions } from 'react-native';
 import Pipe from '@/components/Pipe';
 import PipeTop from '@/components/PipeTop';
 import PipeBottom from '@/components/PipeBottom';
+import Bonus from '@/components/Bonus';
 // import Const from '@/assets/Constants';
+import Images from '@/assets/Images';
+import { Image } from 'react-native';
 
 const MAX_WIDTH = Dimensions.get("window").width;
 const MAX_HEIGHT = Dimensions.get("window").height;
 const PIPE_WIDTH= 100;
+const BONUS_HEIGHT= 41;
 const GAP_SIZE= 320;
 
 let pipes = 0;
@@ -32,6 +36,87 @@ export const generatePipes = () => {
     return sizes;
 }
 
+//  export const addPipesAtLocation = (x, world, entities) => {
+//     let [pipe1Height, pipe2Height] = generatePipes();
+
+//     let pipeTopWidth = PIPE_WIDTH + 20;
+//     let pipeTopHeight = (pipeTopWidth / 205) * 95;
+
+//     pipe1Height = pipe1Height - pipeTopHeight;
+
+//     let pipe1Top = Matter.Bodies.rectangle(
+//         x,
+//         pipe1Height + (pipeTopHeight / 2),
+//         pipeTopWidth,
+//         pipeTopHeight,
+//         { isStatic: true}
+//     );
+
+//     let pipe1 = Matter.Bodies.rectangle(
+//         x,
+//         pipe1Height / 2,
+//         PIPE_WIDTH,
+//         pipe1Height,
+//         { isStatic: true}
+//     );
+
+//     pipe2Height = pipe2Height - pipeTopHeight;
+
+//     let pipe2Top = Matter.Bodies.rectangle(
+//         x,
+//         MAX_HEIGHT - 50 - pipe2Height - (pipeTopHeight / 2),
+//         pipeTopWidth,
+//         pipeTopHeight,
+//         { isStatic: true}
+//     );
+
+//     let pipe2 = Matter.Bodies.rectangle(
+//         x,
+//         MAX_HEIGHT - 50 - (pipe2Height / 2),
+//         PIPE_WIDTH,
+//         pipe2Height,
+//         { isStatic: true}
+//     );
+//       // Add bonus in between pipes if after the first screen
+//   if (pipes > 0) {
+//     let bonusX = x;
+//     let bonusY = (MAX_HEIGHT - GAP_SIZE) / 2;
+
+//     let bonus = Matter.Bodies.rectangle(bonusX, bonusY, 50, BONUS_HEIGHT, { isStatic: true, label: 'bonus' });
+//     let bonusType = Math.floor(Math.random() * Images.bonuses.length); // Randomly select a bonus type
+
+//     Matter.World.add(world, [pipe1, pipe1Top, pipe2, pipe2Top,bonus]);
+
+//     entities["pipe" + (pipes + 1)] = {
+//         body: pipe1, renderer: Pipe, scored: false
+//     }
+
+//     entities["pipe" + (pipes + 2)] = {
+//         body: pipe2, renderer: Pipe, scored: false
+//     }
+
+//     entities["pipe" + (pipes + 1) + "Top"] = {
+//         body: pipe1Top, renderer: PipeTop, scored: false
+//     }
+
+//     entities["pipe" + (pipes + 2) + "Top"] = {
+//         body: pipe2Top, renderer: PipeTop, scored: false
+//     }
+//     entities['bonus' + pipes] = { body: bonus, renderer: Bonus, scored: false, type: bonusType }; // Pass type to bonus
+
+// } else {
+//     Matter.World.add(world, [pipe1, pipe1Top, pipe2, pipe2Top]);
+
+//     entities['pipe' + (pipes + 1)] = { body: pipe1, renderer: Pipe, scored: false };
+//     entities['pipe' + (pipes + 2)] = { body: pipe2, renderer: Pipe, scored: false };
+//     entities['pipe' + (pipes + 1) + 'Top'] = { body: pipe1Top, renderer: PipeTop, scored: false };
+//     entities['pipe' + (pipes + 2) + 'Top'] = { body: pipe2Top, renderer: PipeTop, scored: false };
+//   }
+
+
+//     pipes += 2;
+// }
+
 export const addPipesAtLocation = (x, world, entities) => {
     let [pipe1Height, pipe2Height] = generatePipes();
 
@@ -45,7 +130,7 @@ export const addPipesAtLocation = (x, world, entities) => {
         pipe1Height + (pipeTopHeight / 2),
         pipeTopWidth,
         pipeTopHeight,
-        { isStatic: true}
+        { isStatic: true }
     );
 
     let pipe1 = Matter.Bodies.rectangle(
@@ -53,7 +138,7 @@ export const addPipesAtLocation = (x, world, entities) => {
         pipe1Height / 2,
         PIPE_WIDTH,
         pipe1Height,
-        { isStatic: true}
+        { isStatic: true }
     );
 
     pipe2Height = pipe2Height - pipeTopHeight;
@@ -63,7 +148,7 @@ export const addPipesAtLocation = (x, world, entities) => {
         MAX_HEIGHT - 50 - pipe2Height - (pipeTopHeight / 2),
         pipeTopWidth,
         pipeTopHeight,
-        { isStatic: true}
+        { isStatic: true }
     );
 
     let pipe2 = Matter.Bodies.rectangle(
@@ -71,25 +156,32 @@ export const addPipesAtLocation = (x, world, entities) => {
         MAX_HEIGHT - 50 - (pipe2Height / 2),
         PIPE_WIDTH,
         pipe2Height,
-        { isStatic: true}
+        { isStatic: true }
     );
 
-    Matter.World.add(world, [pipe1, pipe1Top, pipe2, pipe2Top]);
+    // Add bonus in between pipes if after the first screen
+    if (pipes > 0) {
+        let bonusX = x;
+        let bonusY = pipe1Height + (GAP_SIZE / 2); // Correctly position bonus between pipes
 
-    entities["pipe" + (pipes + 1)] = {
-        body: pipe1, renderer: Pipe, scored: false
-    }
+        let bonus = Matter.Bodies.rectangle(bonusX, bonusY, 50, BONUS_HEIGHT, { isStatic: true, label: 'bonus' });
+        let bonusType = Math.floor(Math.random() * Images.bonuses.length); // Randomly select a bonus type
 
-    entities["pipe" + (pipes + 2)] = {
-        body: pipe2, renderer: Pipe, scored: false
-    }
 
-    entities["pipe" + (pipes + 1) + "Top"] = {
-        body: pipe1Top, renderer: PipeTop, scored: false
-    }
+        Matter.World.add(world, [pipe1, pipe1Top, pipe2, pipe2Top, bonus]);
 
-    entities["pipe" + (pipes + 2) + "Top"] = {
-        body: pipe2Top, renderer: PipeTop, scored: false
+        entities["pipe" + (pipes + 1)] = { body: pipe1, renderer: Pipe, scored: false };
+        entities["pipe" + (pipes + 2)] = { body: pipe2, renderer: Pipe, scored: false };
+        entities["pipe" + (pipes + 1) + "Top"] = { body: pipe1Top, renderer: PipeTop, scored: false };
+        entities["pipe" + (pipes + 2) + "Top"] = { body: pipe2Top, renderer: PipeTop, scored: false };
+        entities['bonus' + pipes] = { body: bonus, renderer: Bonus, scored: false, type: bonusType }; // Add bonus to entities
+    } else {
+        Matter.World.add(world, [pipe1, pipe1Top, pipe2, pipe2Top]);
+
+        entities['pipe' + (pipes + 1)] = { body: pipe1, renderer: Pipe, scored: false };
+        entities['pipe' + (pipes + 2)] = { body: pipe2, renderer: Pipe, scored: false };
+        entities['pipe' + (pipes + 1) + 'Top'] = { body: pipe1Top, renderer: PipeTop, scored: false };
+        entities['pipe' + (pipes + 2) + 'Top'] = { body: pipe2Top, renderer: PipeTop, scored: false };
     }
 
     pipes += 2;
@@ -149,7 +241,15 @@ const Physics = (entities, { touches, time, dispatch }) => {
             } else {
                 Matter.Body.translate(entities[key].body, { x: -2, y: 0 });
             }
-        }
+        } else if (key.indexOf('bonus') === 0) {
+            const collisionResult = Matter.Collision.collides(bird, entities[key].body);
+            if (collisionResult !== null && collisionResult.collided) {
+                delete entities[key];
+                dispatch({ type: 'bonus', score: 10 });
+            } else {
+                Matter.Body.translate(entities[key].body, { x: -2, y: 0 });
+            }
+          }
     });
 
     return entities;

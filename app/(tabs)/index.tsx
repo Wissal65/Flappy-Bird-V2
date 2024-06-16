@@ -37,6 +37,7 @@ const Game = () => {
         );
 
         Matter.World.add(world, [bird, floor1, floor2]); // Add bodies to the Matter world
+        
         Matter.Events.on(engine, 'collisionStart', (event) => { // Listen for collision events
             if (gameEngine.current) { // Ensure gameEngine.current is not null
                 var pairs = event.pairs;
@@ -52,15 +53,19 @@ const Game = () => {
         };
     }, [gameEngine]); // Dependency array includes gameEngine
 
-    const entities = useRef(setupWorld()); // Create a ref for entities, initialize with setupWorld
+    const entities = useRef(setupWorld());
 
-    const onEvent = useCallback((e: { type: string; }) => { // Define function onEvent
-        if (e.type === "game-over") { // Check if event type is game-over
-            setRunning(false); // Set running to false
-        } else if (e.type === "score") { // Check if event type is score
-            setScore(prevScore => prevScore + 1); // Increment score by 1
+    const onEvent = useCallback((e: { type: string; score?: number; }) => {
+        if (e.type === "game-over") {
+            setRunning(false);
+        } else if (e.type === "score") {
+            setScore(prevScore => prevScore + 1);
+        } else if (e.type === 'bonus' && e.score !== undefined) {
+            setScore(prevScore => prevScore + e.score!); // Add ! to assert that e.score is not undefined
         }
-    }, []); // Dependency array is empty
+    }, []);
+    
+    
 
     const reset = useCallback(() => { // Define function reset
         resetPipes();
