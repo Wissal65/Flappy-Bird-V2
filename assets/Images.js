@@ -7,4 +7,9 @@ export default Images = {
     // pipeTop: require('./images/pipe_top.png'),
     pipeTop: require('./images/pipe_top_v2.png'),
     pipeBottom: require('./images/pipe_bottom.png'),
+    bonuses: [
+    require('./images/bonus1.png'), // e.g., Cloud of CO2
+    require('./images/bonus2.png'), // e.g., Cloud of NO2
+    // Add more bonus images as needed
+  ],
 }
