@@ -7,13 +7,37 @@ import Const from '@/assets/Constants';
 import Floor from '@/components/Floor';
 import Bird from '@/components/Bird';
 import Physics, { resetPipes }  from '@/Physics';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Game = () => {
     const [running, setRunning] = useState(true); // Declare state variable running, initialize to true, and create setter function setRunning
     const [score, setScore] = useState(0); // Declare state variable score, initialize to 0, and create setter function setScore
     const gameEngine = useRef<GameEngine & { dispatch: (e: any) => void }>(null); // Create a ref for the game engine with explicit type
+    const [timeLeft, setTimeLeft] = useState(10);
      // Function to save score in AsyncStorage
+     const saveScore = async (newScore: number) => {
+        try {
+            await AsyncStorage.setItem('score', newScore.toString());
+        } catch (e) {
+            console.error('Failed to save the score.');
+        }
+    };
 
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTimeLeft(prevTime => prevTime - 1);
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    useEffect(() => {
+        if (timeLeft === 0) {
+            setRunning(false);
+            saveScore(score); // Save score when the game is over
+        }
+    }, [timeLeft]);
 
 
     const setupWorld = useCallback(() => { // Define function setupWorld
@@ -73,6 +97,7 @@ const Game = () => {
     const onEvent = useCallback((e: { type: string; score?: number; }) => {
         if (e.type === "game-over") {
             setRunning(false);
+            saveScore(score);
         } else if (e.type === "score") {
             setScore(prevScore => prevScore + 1);
         } else if (e.type === 'bonus' && e.score !== undefined) {
@@ -87,6 +112,7 @@ const Game = () => {
         entities.current = setupWorld(); // Reset entities with setupWorld
         setRunning(true); // Set running to true
         setScore(0); // Reset score to 0 when the game is restarted
+        setTimeLeft(10);
     }, [setupWorld]); // Dependency array includes setupWorld
 
     return ( // Return JSX
@@ -102,6 +128,7 @@ const Game = () => {
                 <StatusBar hidden={true} />
             </GameEngine>
             <Text style={styles.score}>{score}</Text>
+            <Text >{timeLeft}</Text>
             {!running && (
                 <TouchableOpacity style={styles.fullScreenButton} onPress={reset}>
                     <View style={styles.fullScreen}>
