@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react'; 
+import React, { useState, useRef, useCallback,useEffect } from 'react'; 
 import { StyleSheet, Text, View, StatusBar, TouchableOpacity, Image } from 'react-native'; 
 import Matter from "matter-js"; 
 import { GameEngine } from "react-native-game-engine";  
@@ -12,6 +12,9 @@ const Game = () => {
     const [running, setRunning] = useState(true); // Declare state variable running, initialize to true, and create setter function setRunning
     const [score, setScore] = useState(0); // Declare state variable score, initialize to 0, and create setter function setScore
     const gameEngine = useRef<GameEngine & { dispatch: (e: any) => void }>(null); // Create a ref for the game engine with explicit type
+     // Function to save score in AsyncStorage
+
+
 
     const setupWorld = useCallback(() => { // Define function setupWorld
         let engine = Matter.Engine.create({ enableSleeping: false }); // Create Matter engine
@@ -25,7 +28,7 @@ const Game = () => {
             Const.MAX_HEIGHT - 25,
             Const.MAX_WIDTH + 4,
             50,
-            { isStatic: true }
+            { isStatic: true ,label: 'ground'}
         );
 
         let floor2 = Matter.Bodies.rectangle( // Create floor body 2
@@ -33,17 +36,29 @@ const Game = () => {
             Const.MAX_HEIGHT - 25,
             Const.MAX_WIDTH + 4,
             50,
-            { isStatic: true }
+            { isStatic: true,label: 'ground' }
         );
 
         Matter.World.add(world, [bird, floor1, floor2]); // Add bodies to the Matter world
         
-        Matter.Events.on(engine, 'collisionStart', (event) => { // Listen for collision events
-            if (gameEngine.current) { // Ensure gameEngine.current is not null
+        Matter.Events.on(engine, 'collisionStart', (event) => {
+            if (gameEngine.current) {
                 var pairs = event.pairs;
-                gameEngine.current.dispatch({ type: "game-over" }); // Dispatch game-over event
+                pairs.forEach((pair) => {
+                    const { bodyA, bodyB } = pair;
+                    const bodies = [bodyA, bodyB];
+        
+                    const isBird = bodies.some(body => body === bird);
+                    const isPipeOrGround = bodies.some(body => body.label === 'pipe' || body.label === 'ground');
+                    const isBonus = bodies.some(body => body.label === 'bonus');
+        
+                    if (isBird && isPipeOrGround) {
+                        gameEngine.current?.dispatch({ type: "game-over" });
+                    }
+                });
             }
         });
+        
 
         return { // Return entities object
             physics: { engine: engine, world: world }, // Physics engine and world
@@ -71,7 +86,7 @@ const Game = () => {
         resetPipes();
         entities.current = setupWorld(); // Reset entities with setupWorld
         setRunning(true); // Set running to true
-        setScore(0); // Reset score to 0
+        setScore(0); // Reset score to 0 when the game is restarted
     }, [setupWorld]); // Dependency array includes setupWorld
 
     return ( // Return JSX

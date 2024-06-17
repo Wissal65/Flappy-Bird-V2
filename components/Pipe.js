@@ -18,7 +18,7 @@ const pipeIterations = Math.ceil(height / pipeHeight)
                {Array.from({ length: pipeIterations }).map((_, idx) => {
                 return (
                     <Image
-                        style={[styles.image,{width: width, height: pipeHeight }]}
+                        style={[styles.image,{width: width, height: pipeHeight}]}
                         resizeMode="stretch"
                         source={Images.pipeCore}
                         key={idx} 
