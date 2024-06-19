@@ -12,7 +12,7 @@ const MAX_WIDTH = Dimensions.get("window").width;
 const MAX_HEIGHT = Dimensions.get("window").height;
 const PIPE_WIDTH= 100;
 const BONUS_HEIGHT= 41;
-const GAP_SIZE= 320;
+const GAP_SIZE= 330;
 
 let pipes = 0;
 
@@ -265,9 +265,10 @@ const Physics = (entities, { touches, time, dispatch }) => {
     touches.filter(t => t.type === "press").forEach(t => {
         if (!hadTouches){
             if (world.gravity.y === 0.0){
-                world.gravity.y = 1.2;
+                world.gravity.y = 1.3;
                 addPipesAtLocation((MAX_WIDTH * 1) - (PIPE_WIDTH / 2), world, entities);
                 addPipesAtLocation((MAX_WIDTH * 2) - (PIPE_WIDTH / 2), world, entities);
+                dispatch({ type: "start-timer" }); // Dispatch the start-timer action
             }
 
             hadTouches = true;

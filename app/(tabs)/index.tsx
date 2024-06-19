@@ -9,11 +9,15 @@ import Bird from '@/components/Bird';
 import Physics, { resetPipes }  from '@/Physics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+
 const Game = () => {
     const [running, setRunning] = useState(true); // Declare state variable running, initialize to true, and create setter function setRunning
     const [score, setScore] = useState(0); // Declare state variable score, initialize to 0, and create setter function setScore
     const gameEngine = useRef<GameEngine & { dispatch: (e: any) => void }>(null); // Create a ref for the game engine with explicit type
     const [timeLeft, setTimeLeft] = useState(10);
+    const [timerStarted, setTimerStarted] = useState(false); // Track if the timer has started
+    const timerInterval = useRef<NodeJS.Timeout | null>(null); // Reference to the timer interval
+
      // Function to save score in AsyncStorage
      const saveScore = async (newScore: number) => {
         try {
@@ -23,19 +27,32 @@ const Game = () => {
         }
     };
 
+    const clearTimerInterval = () => {
+        if (timerInterval.current) {
+            clearInterval(timerInterval.current);
+            timerInterval.current = null;
+            console.log("Timer interval cleared");
+        }
+    };
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            setTimeLeft(prevTime => prevTime - 1);
-        }, 1000);
+        if (timerStarted) { // Start the timer only if it has started
+            timerInterval.current = setInterval(() => {
+                setTimeLeft(prevTime => prevTime - 1);
+            }, 1000);
+            console.log("Timer interval started");
+        }
 
-        return () => clearInterval(interval);
-    }, []);
+        return () => {
+            clearTimerInterval();
+        };
+    }, [timerStarted]);
 
     useEffect(() => {
         if (timeLeft === 0) {
             setRunning(false);
             saveScore(score); // Save score when the game is over
+            clearTimerInterval(); // Clear the interval on game over
         }
     }, [timeLeft]);
 
@@ -97,13 +114,16 @@ const Game = () => {
     const onEvent = useCallback((e: { type: string; score?: number; }) => {
         if (e.type === "game-over") {
             setRunning(false);
+            clearTimerInterval(); // Clear the interval on game over
             saveScore(score);
         } else if (e.type === "score") {
             setScore(prevScore => prevScore + 1);
         } else if (e.type === 'bonus' && e.score !== undefined) {
             setScore(prevScore => prevScore + e.score!); // Add ! to assert that e.score is not undefined
+        }else if (e.type === 'start-timer') { // Handle the start-timer action
+            setTimerStarted(true);
         }
-    }, []);
+    }, [score]);
     
     
 
@@ -113,6 +133,8 @@ const Game = () => {
         setRunning(true); // Set running to true
         setScore(0); // Reset score to 0 when the game is restarted
         setTimeLeft(10);
+        setTimerStarted(false); // Reset the timer state
+        clearTimerInterval(); // Clear the interval on reset
     }, [setupWorld]); // Dependency array includes setupWorld
 
     return ( // Return JSX
@@ -188,6 +210,5 @@ const styles = StyleSheet.create({ // Define styles using StyleSheet
 });
 
 export default Game; // Export Game component
-
 
 
