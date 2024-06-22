@@ -14,7 +14,7 @@ const Game = () => {
     const [running, setRunning] = useState(true); // Declare state variable running, initialize to true, and create setter function setRunning
     const [score, setScore] = useState(0); // Declare state variable score, initialize to 0, and create setter function setScore
     const gameEngine = useRef<GameEngine & { dispatch: (e: any) => void }>(null); // Create a ref for the game engine with explicit type
-    const [timeLeft, setTimeLeft] = useState(10);
+    const [timeLeft, setTimeLeft] = useState(50);
     const [timerStarted, setTimerStarted] = useState(false); // Track if the timer has started
     const timerInterval = useRef<NodeJS.Timeout | null>(null); // Reference to the timer interval
 
@@ -41,6 +41,8 @@ const Game = () => {
                 setTimeLeft(prevTime => prevTime - 1);
             }, 1000);
             console.log("Timer interval started");
+        }else {
+            clearTimerInterval(); // Stop the timer if it's not started
         }
 
         return () => {
@@ -62,7 +64,11 @@ const Game = () => {
         let world = engine.world; // Get Matter world from engine
         world.gravity.y = 0.0; // Set gravity to 0
         
-        let bird = Matter.Bodies.rectangle( Const.MAX_WIDTH / 2, Const.MAX_HEIGHT / 2, Const.BIRD_WIDTH, Const.BIRD_HEIGHT);
+        let bird = Matter.Bodies.rectangle( Const.MAX_WIDTH / 2, Const.MAX_HEIGHT / 2, Const.BIRD_WIDTH, Const.BIRD_HEIGHT,{
+            // inertia: Infinity, // Prevent rotation
+            // // frictionAir: 0,    // Disable air friction
+            // isStatic: false,   // Ensure it's not a static body      // Add label for identification
+          });
 
         let floor1 = Matter.Bodies.rectangle( // Create floor body 1
             Const.MAX_WIDTH / 2,
@@ -132,9 +138,13 @@ const Game = () => {
         entities.current = setupWorld(); // Reset entities with setupWorld
         setRunning(true); // Set running to true
         setScore(0); // Reset score to 0 when the game is restarted
-        setTimeLeft(10);
-        setTimerStarted(false); // Reset the timer state
-        clearTimerInterval(); // Clear the interval on reset
+        setTimeLeft(50);
+        setTimerStarted(true); // Reset the timer state
+        // Clear any existing timer interval
+        clearTimerInterval();
+        return () => {
+            clearTimerInterval(); // Cleanup on unmount (not strictly necessary)
+        };
     }, [setupWorld]); // Dependency array includes setupWorld
 
     return ( // Return JSX
@@ -152,7 +162,7 @@ const Game = () => {
             <Text style={styles.score}>{score}</Text>
             <Text >{timeLeft}</Text>
             {!running && (
-                <TouchableOpacity style={styles.fullScreenButton} onPress={reset}>
+                <TouchableOpacity style={styles.fullScreenButton} onPress={reset }>
                     <View style={styles.fullScreen}>
                         <Text style={styles.gameOverText}>Game Over</Text>
                         <Text style={styles.gameOverSubText}>Try Again</Text>

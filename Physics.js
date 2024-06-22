@@ -265,7 +265,7 @@ const Physics = (entities, { touches, time, dispatch }) => {
     touches.filter(t => t.type === "press").forEach(t => {
         if (!hadTouches){
             if (world.gravity.y === 0.0){
-                world.gravity.y = 1.3;
+                world.gravity.y = 1.2;
                 addPipesAtLocation((MAX_WIDTH * 1) - (PIPE_WIDTH / 2), world, entities);
                 addPipesAtLocation((MAX_WIDTH * 2) - (PIPE_WIDTH / 2), world, entities);
                 dispatch({ type: "start-timer" }); // Dispatch the start-timer action
